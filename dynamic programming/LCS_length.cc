@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <chrono>
 /*
 https://www.techiedelight.com/longest-common-subsequence/
 The longest common subsequence (LCS) problem is the problem of finding the
@@ -40,15 +41,10 @@ int LCS_length_lookup(std::string &X, std::string &Y, int m, int n,
   if (lookup.find(key) == lookup.end())
   {
     if (X[m - 1] == Y[n - 1])
-    { 
       lookup[key] = 1 + LCS_length_lookup(X, Y, m - 1, n - 1, lookup);
-    }
     else
-    {
       lookup[key] = std::max(LCS_length_lookup(X, Y, m - 1, n, lookup), LCS_length_lookup(X, Y, m, n - 1, lookup));
-    }
   }
-  std::cout << key <<  "  =  " << lookup[key] << std::endl;
   return lookup[key];
 }
 
@@ -62,13 +58,18 @@ int LCS_length_lookup(std::string &X, std::string &Y, int m, int n,
 //   return (A.length() > B.length()) ? A : B;
 // }
 int main() {
-  std::string X{"A11B11C1D111111E11F"};
-  std::string Y{"2AB222C222D22E2222222F"};
-  // std::string lcs = LCS(X, Y, X.length(), Y.length());
-  // std::cout << lcs << std::endl;
-  std::cout << LCS_length(X, Y, X.length(), Y.length()) << std::endl;
+  std::string X{"A11B11C1D111111EF1"};
+  std::string Y{"2AB222C222D22E2F"};
+
+  auto start = std::chrono::high_resolution_clock::now();
+  int l1 = LCS_length(X, Y, X.length(), Y.length());
+  std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
+  std::cout << "Without Lookup:  " << l1 << " - " << elapsed.count() << std::endl;
 
   std::unordered_map<std::string, int> lookup;
-  std::cout << LCS_length_lookup(X, Y, X.length(), Y.length(), lookup)
-            << std::endl;
+  start = std::chrono::high_resolution_clock::now();
+  int l2 = LCS_length_lookup(X, Y, X.length(), Y.length(), lookup);
+  elapsed = std::chrono::high_resolution_clock::now() - start;
+
+  std::cout << "With Lookup:     " << l2 << " - " << elapsed.count() << std::endl;
 }
